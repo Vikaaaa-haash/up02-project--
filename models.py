@@ -65,7 +65,7 @@ class Product:
         )
     def discounted_price(self):
         """Цена со скидкой 25% (упрощённо)."""
-        return self.price * 0.75
+        return self.price * 0.80   # изменено в ветке conflict-test
 
 class Order:
     """Класс Заказ."""
