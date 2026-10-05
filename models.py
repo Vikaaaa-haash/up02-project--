@@ -44,10 +44,44 @@ class Product:
         """True, если количество ≤ 3."""
         return self.quantity <= 3
 
+    def is_available(self):
+        """True, если товар есть в наличии (количество > 0)."""
+        return self.quantity > 0
+
     def info(self):
         """Строка с информацией об автомобиле."""
         return (
             f"{self.full_name()}: "
             f"{int(self.price)} руб. × {self.quantity} = {int(self.total())} руб. "
             f"({self.indicator()})"
+        )
+
+
+class Order:
+    """Класс Заказ."""
+
+    def __init__(self, order_id, date, client, product, quantity):
+        """
+        :param order_id: идентификатор заказа
+        :param date: дата заказа
+        :param client: ФИО клиента
+        :param product: объект Product (автомобиль)
+        :param quantity: количество
+        """
+        self.id = order_id
+        self.date = date
+        self.client = client
+        self.product = product
+        self.quantity = quantity
+
+    def total(self):
+        """Стоимость заказа."""
+        return self.product.price * self.quantity
+
+    def info(self):
+        """Строка с информацией о заказе."""
+        return (
+            f"Заказ №{self.id} от {self.date}: "
+            f"{self.client} — {self.product.full_name()} × {self.quantity} "
+            f"= {int(self.total())} руб."
         )
