@@ -7,7 +7,8 @@ markdown
 **Репозиторий:** <URL>https://github.com/Vikaaaa-haash/up02-project--
 **Дата:** 02.10.2026
 
+
 ## Ветка main
 Изменение из основной ветки.
 ## Ветка conflict-2
-Изменение из ветки.
+
