@@ -1,4 +1,6 @@
 """Модели данных для проекта УП.02."""
+from datetime import datetime
+from discount import calculate_price_with_discount
 
 
 class Product:
@@ -33,8 +35,14 @@ class Product:
         return self.price * self.quantity
 
     def price_with_discount(self, discount_percent):
-        """Цена со скидкой."""
+        """Цена со скидкой вручную (по проценту)."""
         return self.price * (1 - discount_percent / 100)
+
+    def price_with_discount_auto(self, date=None):
+        """Цена со скидкой по алгоритму ДЭ (25% для товаров без заказов в прошлом месяце)."""
+        if date is None:
+            date = datetime.now()
+        return calculate_price_with_discount(self.id, self.price, date)
 
     def indicator(self):
         """Индикатор «много/мало» (порог 5)."""
@@ -45,7 +53,7 @@ class Product:
         return self.quantity <= 3
 
     def is_available(self):
-        """True, если товар есть в наличии (количество > 0)."""
+        """True, если товар есть в наличии."""
         return self.quantity > 0
 
     def info(self):
@@ -61,13 +69,6 @@ class Order:
     """Класс Заказ."""
 
     def __init__(self, order_id, date, client, product, quantity):
-        """
-        :param order_id: идентификатор заказа
-        :param date: дата заказа
-        :param client: ФИО клиента
-        :param product: объект Product (автомобиль)
-        :param quantity: количество
-        """
         self.id = order_id
         self.date = date
         self.client = client
