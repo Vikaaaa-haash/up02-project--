@@ -5,7 +5,7 @@ markdown
 **Группа:**3ИП-1-24
 **GitHub:** Vikaaaa-haash
 **Репозиторий:** <URL>https://github.com/Vikaaaa-haash/up02-project--
-**Дата:** 02.10.2026
+**Дата:** 06.10.2026 (изменено через GitHub)
 
 
 
