@@ -81,5 +81,6 @@ def create_product_card(parent, product):
     tk.Label(text_frame, text=f"{int(price)} руб.",
              font=(FONT_FAMILY, 14, "bold"),
              bg=bg_color, anchor="e").pack(fill="x")
+    tk.Frame(parent, height=1, bg="#cccccc").pack(fill="x", padx=10)
 
     return card
