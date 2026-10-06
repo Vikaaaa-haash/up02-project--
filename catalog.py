@@ -66,6 +66,22 @@ def _add_text_info(card, product, bg_color, qty):
     _add_label(text_frame, f"Количество: {_indicator(qty)} ({qty})", bg_color)
     _add_label(text_frame, f"{int(price)} руб.",
                bg_color, bold=True, size=FONT_SIZE_HEADER, align="e")
+    # Товар с ценой > 1 000 000
+    if price > 1000000:
+        price_str = f"{int(price):,} руб.".replace(",", " ")
+    else:
+        price_str = f"{int(price)} руб."
+
+    # Товар с очень длинным названием
+    full_name = f"{marka} | {model}"
+    if len(full_name) > 50:
+        full_name = full_name[:47] + "..."
+
+    _add_label(text_frame, full_name,
+               bg_color, bold=True, size=FONT_SIZE_TITLE)
+    # ... остальное
+    _add_label(text_frame, price_str,
+               bg_color, bold=True, size=FONT_SIZE_HEADER, align="e")
 
 
 def _add_label(parent, text, bg_color, bold=False,
