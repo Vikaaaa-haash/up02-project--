@@ -1,5 +1,6 @@
-"""Каталог автомобилей (вариант 11)."""
+"""Каталог автомобилей (вариант 11) — рефакторинг."""
 import tkinter as tk
+
 from styles import (
     COLOR_MAIN_BG, COLOR_HIGHLIGHT,
     FONT_SIZE_NORMAL, FONT_SIZE_HEADER, FONT_SIZE_TITLE,
@@ -10,62 +11,70 @@ from resources import get_product_image
 
 def create_product_card(parent, product):
     """Создаёт карточку автомобиля по макету."""
-    # Распаковка полей — вариант 11
-    car_id = product[0]
-    marka = product[1]
-    model = product[2]
-    year = product[3]
-    price = product[4]
-    qty = product[5]
-    photo = product[6]
+    qty = product[5]                       # количество — product[5]
+    bg_color = _get_card_color(qty)
 
-    # Подсветка ≤3
-    bg_color = COLOR_HIGHLIGHT if qty <= 3 else COLOR_MAIN_BG
-
-    # Карточка — рамка
     card = tk.Frame(parent, bg=bg_color, bd=1, relief="solid")
     card.pack(fill="x", padx=10, pady=5)
 
-    # === Изображение (слева) — через resources.py ===
+    _add_image(card, product, bg_color)
+    _add_text_info(card, product, bg_color, qty)
+
+    return card
+
+
+def _get_card_color(qty):
+    """Возвращает цвет фона карточки."""
+    return COLOR_HIGHLIGHT if qty <= 3 else COLOR_MAIN_BG
+
+
+def _add_image(card, product, bg_color):
+    """Добавляет изображение автомобиля (или заглушку)."""
     img_frame = tk.Frame(card, bg=bg_color)
     img_frame.pack(side="left", padx=10, pady=10)
 
-    # Путь к фото
-    image_path = f"resources/{photo}" if photo else "resources/picture.png"
+    photo = product[6]                     # фото — product[6]
+    if photo:
+        image_path = f"resources/{photo}"
+    else:
+        image_path = "resources/picture.png"
 
-    # Загружаем фото (или заглушку — автоматически!)
-    photo_img = get_product_image(image_path, size=(100, 100))
-    if photo_img:
-        img_label = tk.Label(img_frame, image=photo_img, bg=bg_color)
-        img_label.image = photo_img   # ВАЖНО: сохраняем ссылку!
+    img = get_product_image(image_path, size=(100, 100))
+    if img:
+        img_label = tk.Label(img_frame, image=img, bg=bg_color)
+        img_label.image = img
         img_label.pack()
     else:
         tk.Label(img_frame, text="[НЕТ ФОТО]", bg=bg_color,
                  width=10, height=5).pack()
 
-    # === Текстовая часть (справа) ===
+
+def _add_text_info(card, product, bg_color, qty):
+    """Добавляет текстовую информацию об автомобиле."""
     text_frame = tk.Frame(card, bg=bg_color)
     text_frame.pack(side="left", fill="both", expand=True, padx=10, pady=10)
 
-    # Марка | Модель
-    tk.Label(text_frame, text=f"{marka} | {model}",
-             font=font(FONT_SIZE_TITLE, bold=True),
-             bg=bg_color, anchor="w").pack(fill="x")
+    # Обработка крайних случаев (пустых полей)
+    marka = product[1] if product[1] else "[Без марки]"
+    model = product[2] if product[2] else "[Без модели]"
+    year = product[3] if product[3] else "—"
+    price = product[4] if product[4] is not None else 0
 
-    # Год
-    tk.Label(text_frame, text=f"Год: {year}",
-             font=font(FONT_SIZE_NORMAL),
-             bg=bg_color, anchor="w").pack(fill="x")
+    _add_label(text_frame, f"{marka} | {model}",
+               bg_color, bold=True, size=FONT_SIZE_TITLE)
+    _add_label(text_frame, f"Год: {year}", bg_color)
+    _add_label(text_frame, f"Количество: {_indicator(qty)} ({qty})", bg_color)
+    _add_label(text_frame, f"{int(price)} руб.",
+               bg_color, bold=True, size=FONT_SIZE_HEADER, align="e")
 
-    # Количество
-    indicator = "много" if qty > 5 else "мало"
-    tk.Label(text_frame, text=f"Количество: {indicator} ({qty})",
-             font=font(FONT_SIZE_NORMAL),
-             bg=bg_color, anchor="w").pack(fill="x")
 
-    # Цена
-    tk.Label(text_frame, text=f"{int(price)} руб.",
-             font=font(FONT_SIZE_HEADER, bold=True),
-             bg=bg_color, anchor="e").pack(fill="x")
+def _add_label(parent, text, bg_color, bold=False,
+               size=FONT_SIZE_NORMAL, align="w"):
+    """Добавляет метку с текстом."""
+    tk.Label(parent, text=text, font=font(size, bold=bold),
+             bg=bg_color, anchor=align).pack(fill="x")
 
-    return card
+
+def _indicator(qty):
+    """Индикатор «много/мало» (порог 5)."""
+    return "много" if qty > 5 else "мало"
