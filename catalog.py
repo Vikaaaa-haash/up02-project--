@@ -54,32 +54,30 @@ def _add_text_info(card, product, bg_color, qty):
     text_frame = tk.Frame(card, bg=bg_color)
     text_frame.pack(side="left", fill="both", expand=True, padx=10, pady=10)
 
-    # Обработка крайних случаев (пустых полей)
+    # Обработка пустых полей
     marka = product[1] if product[1] else "[Без марки]"
     model = product[2] if product[2] else "[Без модели]"
     year = product[3] if product[3] else "—"
     price = product[4] if product[4] is not None else 0
 
-    _add_label(text_frame, f"{marka} | {model}",
-               bg_color, bold=True, size=FONT_SIZE_TITLE)
-    _add_label(text_frame, f"Год: {year}", bg_color)
-    _add_label(text_frame, f"Количество: {_indicator(qty)} ({qty})", bg_color)
-    _add_label(text_frame, f"{int(price)} руб.",
-               bg_color, bold=True, size=FONT_SIZE_HEADER, align="e")
-    # Товар с ценой > 1 000 000
+    # Форматирование цены: 1 200 000 вместо 1200000
     if price > 1000000:
         price_str = f"{int(price):,} руб.".replace(",", " ")
     else:
         price_str = f"{int(price)} руб."
 
-    # Товар с очень длинным названием
-    full_name = f"{marka} | {model}"
-    if len(full_name) > 50:
-        full_name = full_name[:47] + "..."
-
-    _add_label(text_frame, full_name,
+    # Название (ОДИН раз!)
+    _add_label(text_frame, f"{marka} | {model}",
                bg_color, bold=True, size=FONT_SIZE_TITLE)
-    # ... остальное
+
+    # Год
+    _add_label(text_frame, f"Год: {year}", bg_color)
+
+    # Количество с индикатором
+    icon = _get_indicator_icon(qty) if 'qty' in dir() else ""
+    _add_label(text_frame, f"{icon} Количество: {_indicator(qty)} ({qty} шт.)", bg_color)
+
+    # Цена 
     _add_label(text_frame, price_str,
                bg_color, bold=True, size=FONT_SIZE_HEADER, align="e")
 
@@ -94,3 +92,12 @@ def _add_label(parent, text, bg_color, bold=False,
 def _indicator(qty):
     """Индикатор «много/мало» (порог 5)."""
     return "много" if qty > 5 else "мало"
+
+def _get_indicator_icon(qty):
+    """Возвращает иконку для индикатора."""
+    if qty > 5:
+        return "✅"   # много
+    elif qty > 3:
+        return "⚠️"   # средне
+    else:
+        return "❌"   # мало
