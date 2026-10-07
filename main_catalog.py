@@ -3,8 +3,8 @@ import os
 import tkinter as tk
 from tkinter import ttk
 from styles import (
-    COLOR_MAIN_BG, COLOR_SECONDARY_BG,
-    FONT_SIZE_TITLE, FONT_SIZE_NORMAL, font,
+    COLOR_MAIN_BG, COLOR_SECONDARY_BG, COLOR_HIGHLIGHT, COLOR_ACCENT,
+    FONT_SIZE_TITLE, FONT_SIZE_NORMAL, FONT_SIZE_HEADER, font,
 )
 from config import APP_TITLE
 import database as db
@@ -98,6 +98,26 @@ class CatalogWindow:
             font=font(FONT_SIZE_NORMAL),
         ).pack(side="right", padx=15)
 
+                # Легенда подсветки (А5)
+        legend_frame = tk.Frame(header, bg=COLOR_SECONDARY_BG)
+        legend_frame.pack(side="right", padx=15)
+
+        # Красный кружок — мало
+        tk.Label(legend_frame, text="●", fg=COLOR_HIGHLIGHT,
+                 bg=COLOR_SECONDARY_BG,
+                 font=font(FONT_SIZE_HEADER)).pack(side="left")
+        tk.Label(legend_frame, text="Мало (≤3)",
+                 bg=COLOR_SECONDARY_BG,
+                 font=font(FONT_SIZE_NORMAL)).pack(side="left", padx=(0, 10))
+
+        # Белый кружок — в наличии
+        tk.Label(legend_frame, text="●", fg=COLOR_MAIN_BG,
+                 bg=COLOR_SECONDARY_BG,
+                 font=font(FONT_SIZE_HEADER)).pack(side="left")
+        tk.Label(legend_frame, text="В наличии",
+                 bg=COLOR_SECONDARY_BG,
+                 font=font(FONT_SIZE_NORMAL)).pack(side="left")
+
         # === Панель управления ===
         controls = tk.Frame(self.root, bg=COLOR_SECONDARY_BG)
         controls.pack(fill="x", pady=5)
@@ -120,6 +140,19 @@ class CatalogWindow:
                      values=["Без сортировки", "Цена ↑", "Цена ↓", "Марка А-Я"],
                      state="readonly", width=15).pack(side="left", padx=2)
         self.sort_var.trace_add("write", lambda *a: self.refresh_catalog())
+
+                # === Кнопка "Только мало" (А6) ===
+        tk.Button(
+            controls,
+            text="Только мало",
+            command=self.show_only_low_stock,
+            bg=COLOR_ACCENT,
+            fg="white",
+            font=font(10),
+            relief="flat",
+            padx=10, pady=3,
+            cursor="hand2",
+        ).pack(side="left", padx=10)
 
         # === Каталог ===
         container = tk.Frame(self.root, bg=COLOR_MAIN_BG)
@@ -172,6 +205,32 @@ class CatalogWindow:
             tk.Label(self.catalog_frame, text="Ничего не найдено",
                      font=font(14), bg=COLOR_MAIN_BG,
                      fg="#888888").pack(pady=50)
+
+    def show_only_low_stock(self):
+        """Показывает только товары с количеством ≤3 (А6)."""
+        # Очищаем каталог
+        for widget in self.catalog_frame.winfo_children():
+            widget.destroy()
+
+        # Загружаем товары
+        products = db.get_all_products()
+
+        # Фильтруем
+        low_stock = [p for p in products if p[5] <= 3]
+
+        # Отображаем
+        for p in low_stock:
+            create_product_card(self.catalog_frame, p)
+
+        # Если ничего нет — сообщение
+        if not low_stock:
+            tk.Label(
+                self.catalog_frame,
+                text="Нет товаров с низким остатком",
+                font=font(14),
+                bg=COLOR_MAIN_BG,
+                fg="#888888",
+            ).pack(pady=50)
 
     def run(self):
         self.root.mainloop()
