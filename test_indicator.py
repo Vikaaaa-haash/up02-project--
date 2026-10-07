@@ -33,3 +33,33 @@ def test_indicator():
 
 if __name__ == "__main__":
     test_indicator()
+def test_indicator_extended():
+    """Расширенные тесты индикатора."""
+    test_cases = [
+        (1000, "много", "большое число"),
+        (50, "много", "среднее значение"),
+        (5, "мало", "граница (повторно)"),
+        (6, "много", "граница (повторно)"),
+        (-1, "мало", "отрицательное (крайний случай)"),
+    ]
+
+    print("=" * 60)
+    print("РАСШИРЕННЫЕ ТЕСТЫ ИНДИКАТОРА")
+    print("=" * 60)
+
+    passed = 0
+    for qty, expected, comment in test_cases:
+        result = _indicator(qty)
+        status = "✅" if result == expected else "❌"
+        if result == expected:
+            passed += 1
+        print(f"{status} qty={qty}: {result} (ожидалось {expected}) — {comment}")
+
+    print("=" * 60)
+    print(f"Пройдено: {passed} / {len(test_cases)}")
+
+
+if __name__ == "__main__":
+    test_indicator()
+    print()
+    test_indicator_extended()
