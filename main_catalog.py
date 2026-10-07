@@ -11,6 +11,12 @@ import database as db
 from catalog import create_product_card
 from resources import load_image_proportional, PATH_LOGO, PATH_ICON
 
+def count_indicators(products):
+    """Считает количество товаров по индикаторам."""
+    many = sum(1 for p in products if p[5] > 5)   # p[5] — количество!
+    few = len(products) - many
+    return many, few
+
 def set_app_icon(root, icon_path):
     """Устанавливает иконку приложения кроссплатформенно."""
     from resources import load_image_proportional
@@ -81,6 +87,16 @@ class CatalogWindow:
         tk.Label(header, text="КАТАЛОГ АВТОМОБИЛЕЙ",
                  font=font(FONT_SIZE_TITLE, bold=True),
                  bg=COLOR_SECONDARY_BG).pack(expand=True)
+
+                # Статистика в шапке
+        products = db.get_all_products()
+        many, few = count_indicators(products)
+        tk.Label(
+            header,
+            text=f"Много: {many} | Мало: {few}",
+            bg=COLOR_SECONDARY_BG,
+            font=font(FONT_SIZE_NORMAL),
+        ).pack(side="right", padx=15)
 
         # === Панель управления ===
         controls = tk.Frame(self.root, bg=COLOR_SECONDARY_BG)
