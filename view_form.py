@@ -73,6 +73,27 @@ class ViewForm:
             "Описание",
             f"Автомобиль {self.product[1]} {self.product[2]}"
         )
+                # === Поле ввода количества (ДЗ) ===
+        tk.Label(
+            info_frame,
+            text="Количество для заказа:",
+            font=font(FONT_SIZE_NORMAL, bold=True),
+            bg=COLOR_MAIN_BG,
+        ).pack(anchor="w", pady=(15, 0))
+
+        self.qty_entry = tk.Entry(info_frame, width=10)
+        self.qty_entry.pack(anchor="w", pady=5)
+
+        tk.Button(
+            info_frame,
+            text="Проверить",
+            command=self._check_qty,
+            bg=COLOR_ACCENT,
+            fg="white",
+            font=font(FONT_SIZE_NORMAL),
+            padx=10, pady=3,
+            relief="flat",
+        ).pack(anchor="w", pady=5)
 
         # === Кнопки ===
         btn_frame = tk.Frame(self.window, bg=COLOR_MAIN_BG)
@@ -125,6 +146,20 @@ class ViewForm:
             bg=COLOR_MAIN_BG,
             anchor="w",
         ).pack(side="left")
+
+    def _check_qty(self):
+        """Проверяет введённое количество (ДЗ)."""
+        from error_handler import validate_positive_int
+
+        ok, result = validate_positive_int(
+            self.qty_entry.get(),
+            "Количество"
+        )
+
+        if ok:
+            messagebox.showinfo("OK", f"Количество: {result}")
+        else:
+            messagebox.showerror("Ошибка", result)
 
     def add_to_order(self):
         """Обработчик кнопки «Добавить в заказ»."""
