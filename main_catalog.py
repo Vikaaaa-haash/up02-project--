@@ -1,4 +1,5 @@
 """Главное окно приложения с каталогом автомобилей."""
+from error_handler import safe_call
 import os
 import tkinter as tk
 from tkinter import ttk
@@ -176,20 +177,28 @@ class CatalogWindow:
         self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
     def refresh_catalog(self):
+        """Обновляет каталог с обработкой ошибок."""
+        # 1. Очищаем каталог
         for widget in self.catalog_frame.winfo_children():
             widget.destroy()
 
-        products = db.get_all_products()
+        # 2. Загружаем товары БЕЗОПАСНО
+        products = safe_call(db.get_all_products) or []
 
+        # 3. Фильтр по поиску
         query = self.search_var.get().strip().lower()
         if query:
-            products = [p for p in products
-                        if query in str(p[1]).lower() or query in str(p[2]).lower()]
+            products = [
+                p for p in products
+                if query in str(p[1]).lower() or query in str(p[2]).lower()
+            ]
 
+        # 4. Фильтр по марке
         mark = self.mark_var.get()
         if mark and mark != "Все марки":
             products = [p for p in products if p[1] == mark]
 
+        # 5. Сортировка
         sort = self.sort_var.get()
         if sort == "Цена ↑":
             products.sort(key=lambda p: p[4])
@@ -198,13 +207,19 @@ class CatalogWindow:
         elif sort == "Марка А-Я":
             products.sort(key=lambda p: p[1])
 
+        # 6. Отображаем карточки БЕЗОПАСНО
         for p in products:
-            create_product_card(self.catalog_frame, p)
+            safe_call(create_product_card, self.catalog_frame, p)
 
+        # 7. Если пусто — сообщение
         if not products:
-            tk.Label(self.catalog_frame, text="Ничего не найдено",
-                     font=font(14), bg=COLOR_MAIN_BG,
-                     fg="#888888").pack(pady=50)
+            tk.Label(
+                self.catalog_frame,
+                text="Ничего не найдено",
+                font=font(14),
+                bg=COLOR_MAIN_BG,
+                fg="#888888",
+            ).pack(pady=50)
 
     def show_only_low_stock(self):
         """Показывает только товары с количеством ≤3 (А6)."""

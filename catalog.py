@@ -20,7 +20,41 @@ def create_product_card(parent, product):
     _add_image(card, product, bg_color)
     _add_text_info(card, product, bg_color, qty)
 
+        # === Привязка клика ===
+    card.bind("<Button-1>", lambda e: _open_view(parent, product))
+
+    def bind_recursive(widget):
+        widget.bind("<Button-1>", lambda e: _open_view(parent, product))
+        for child in widget.winfo_children():
+            bind_recursive(child)
+
+    bind_recursive(card)
+
+    
     return card
+
+def _open_view(parent, product):
+    """Открывает форму просмотра автомобиля."""
+    from view_form import ViewForm
+
+    # Находим главное окно (Tk), поднимаясь по иерархии
+    root = parent
+    while root.master:
+        root = root.master
+
+    ViewForm(root, product)
+
+def _open_view(parent, product):
+    """Открывает форму просмотра автомобиля."""
+    from view_form import ViewForm
+
+    # Находим главное окно (Tk), поднимаясь по иерархии
+    root = parent
+    while root.master:
+        root = root.master
+
+    ViewForm(root, product)
+
 
 
 def _get_card_color(qty):
