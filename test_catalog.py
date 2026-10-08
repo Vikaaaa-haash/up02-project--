@@ -58,6 +58,16 @@ def test_names_not_empty():
     return True
 
 
+def test_has_image():
+    """Проверяет, что хотя бы у одного товара есть изображение (ДЗ)."""
+    products = db.get_all_products()
+    for p in products:
+        if p[6]:                                 # фото — p[6]
+            return True
+    print("⚠️ Ни у одного товара нет изображения")
+    return False
+
+
 def run_all_tests():
     """Прогон всех тестов каталога."""
     tests = [
@@ -67,6 +77,7 @@ def run_all_tests():
         ("Все цены — числа", test_prices_are_numbers),
         ("Количество не отрицательное", test_quantity_not_negative),
         ("Марки не пустые", test_names_not_empty),
+        ("Хотя бы одно изображение", test_has_image),   # ← ДЗ
     ]
 
     print("=" * 60)
